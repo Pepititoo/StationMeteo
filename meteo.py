@@ -17,7 +17,6 @@ def connecter_bdd():
 
     return db
 
-
 def recuperer_valeurs_capteur():
 
     #params i2c et capteur bme280
@@ -46,15 +45,21 @@ def recuperer_valeurs_api():
     url = "http://api.openweathermap.org/data/2.5/weather?q=pau&lang=fr&units=metric&appid=477e2daf9d3e6f637dcbe5143cb58937"
 
     #execute une requete sur l'api et ajoute les valeurs dans des variables
-    weather_data = requests.get(url).json()
+    response = requests.get(url)
 
-    desc = weather_data['weather'][0]['description']
-    api_temperature = weather_data['main']['temp']
-    temperature_feels_like = weather_data['main']['feels_like']
-    api_pressure = weather_data['main']['pressure']
-    api_humidity = weather_data['main']['humidity']
+    if response.status_code == 200:
 
-    return api_temperature,api_pressure,api_humidity,temperature_feels_like,desc
+        weather_data = response.json()
+        desc = weather_data['weather'][0]['description']
+        api_temperature = weather_data['main']['temp']
+        temperature_feels_like = weather_data['main']['feels_like']
+        api_pressure = weather_data['main']['pressure']
+        api_humidity = weather_data['main']['humidity']
+
+        return api_temperature,api_pressure,api_humidity,temperature_feels_like,desc
+    else:
+        print("Erreur lors de la récupération des données de l'API")
+        raise SystemExit
 
 def ecrire_bdd(temperature,pressure,humidity,temperature_feels_like,desc,date_time,db,origine):
     #ajoute les relevés dans la table readings
