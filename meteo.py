@@ -6,7 +6,6 @@ from RPLCD.i2c import CharLCD
 import mysql.connector
 import requests
 
-
 def connecter_bdd():
     #connexion base de données
     db = mysql.connector.connect(
@@ -17,15 +16,6 @@ def connecter_bdd():
     )
 
     return db
-
-def ecrire_bdd(temperature,pressure,humidity,temperature_feels_like,desc,date_time,db,origine):
-    #ajoute les relevés dans la table readings
-    if origine == "capteur":        
-        db.cursor().execute(f"INSERT INTO readings (temperature, pressure, humidity, date_time) VALUES (%s,%s,%s,%s)", (temperature, pressure, humidity, date_time));
-    else:
-        db.cursor().execute(f"INSERT INTO apireadings (temperature, temperature_feels_like, pressure, humidity, description, date_time) VALUES (%s,%s,%s,%s,%s,%s)", (temperature,temperature_feels_like, pressure, humidity, desc, date_time))
-
-
 
 
 def recuperer_valeurs_capteur():
@@ -51,8 +41,6 @@ def afficher_lcd(temperature,humidity):
     lcd.write_string(f"TEMP: {temperature:.2f}C\n\r")
     lcd.write_string(f"HUMIDITY: {humidity:.2f}%")
 
-
-
 def recuperer_valeurs_api():
     #url d'appel de l'api
     url = "http://api.openweathermap.org/data/2.5/weather?q=pau&lang=fr&units=metric&appid=477e2daf9d3e6f637dcbe5143cb58937"
@@ -68,7 +56,12 @@ def recuperer_valeurs_api():
 
     return api_temperature,api_pressure,api_humidity,temperature_feels_like,desc
 
-
+def ecrire_bdd(temperature,pressure,humidity,temperature_feels_like,desc,date_time,db,origine):
+    #ajoute les relevés dans la table readings
+    if origine == "capteur":        
+        db.cursor().execute(f"INSERT INTO readings (temperature, pressure, humidity, date_time) VALUES (%s,%s,%s,%s)", (temperature, pressure, humidity, date_time));
+    else:
+        db.cursor().execute(f"INSERT INTO apireadings (temperature, temperature_feels_like, pressure, humidity, description, date_time) VALUES (%s,%s,%s,%s,%s,%s)", (temperature,temperature_feels_like, pressure, humidity, desc, date_time))
 
 
 
