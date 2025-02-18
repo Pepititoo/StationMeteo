@@ -61,12 +61,12 @@ def recuperer_valeurs_api():
         print("Erreur lors de la récupération des données de l'API")
         raise SystemExit
 
-def ecrire_bdd(temperature,pressure,humidity,temperature_feels_like,desc,date_time,db,origine):
+def ecrire_bdd(*args):
     #ajoute les relevés dans la table readings
-    if origine == "capteur":        
-        db.cursor().execute(f"INSERT INTO readings (temperature, pressure, humidity, date_time) VALUES (%s,%s,%s,%s)", (temperature, pressure, humidity, date_time));
-    else:
-        db.cursor().execute(f"INSERT INTO apireadings (temperature, temperature_feels_like, pressure, humidity, description, date_time) VALUES (%s,%s,%s,%s,%s,%s)", (temperature,temperature_feels_like, pressure, humidity, desc, date_time))
+    if len(args) == 5:        
+        args[0].cursor().execute(f"INSERT INTO readings (temperature, pressure, humidity, date_time) VALUES (%s,%s,%s,%s)", (args[1], args[2], args[3], args[4]))
+    elif len(args) == 7:
+        args[0].cursor().execute(f"INSERT INTO apireadings (temperature, temperature_feels_like, pressure, humidity, description, date_time) VALUES (%s,%s,%s,%s,%s,%s)", (args[1],args[4], args[2], args[3], args[5], args[6]))
 
 
 
@@ -75,9 +75,9 @@ def main():
   db = connecter_bdd()
   temperature,pressure,humidity = recuperer_valeurs_capteur()
   afficher_lcd(temperature,humidity)
-  ecrire_bdd(temperature,pressure,humidity,"","",date_time,db,"capteur")
+  ecrire_bdd(db,temperature,pressure,humidity,date_time)
   temperature,pressure,humidity,temperature_feels_like,desc = recuperer_valeurs_api()
-  ecrire_bdd(temperature,pressure,humidity,temperature_feels_like,desc,date_time,db,"api")
+  ecrire_bdd(db,temperature,pressure,humidity,temperature_feels_like,desc,date_time)
 
   db.commit()
   db.cursor().close()
